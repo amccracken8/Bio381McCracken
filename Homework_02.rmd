@@ -1,5 +1,5 @@
 ---
-title: "New page"
+title: "Homework_02"
 author: "Andrew"
 date: "1/26/2022"
 output: html_document
@@ -9,12 +9,6 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-This is a new page yay!
-
 [Home Page](index.html)
 
-Let's make a list!
-
-* Buttet 1
-* Another Bullet
 
