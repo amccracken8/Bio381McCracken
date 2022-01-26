@@ -1,0 +1,20 @@
+---
+title: "New page"
+author: "Andrew"
+date: "1/26/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+This is a new page yay!
+
+[Home Page](index.html)
+
+Let's make a list!
+
+* Buttet 1
+* Another Bullet
+
