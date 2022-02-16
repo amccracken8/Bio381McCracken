@@ -1,0 +1,146 @@
+---
+title: "Homework_05"
+author: "Andrew McCracken"
+date: "2/16/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+[Home Page](index.html)
+
+# Working with Matrices, Lists, and Data Frames
+
+### 1. Assign to the variable n_dims a single random integer between 3 and 10.
+```{r}
+# floor rounds down to nearest integer, so setting from 3 to 11 will return a 10 if it is 10.999
+n_dims <- floor(runif(1,3,11))
+n_dims
+```
+* Create a vector of consecutive integers from 1 to n_dims2
+```{r}
+myvec <- seq(1,(n_dims)^2)
+myvec
+```
+* Use the sample function to randomly reshuffle these values.
+```{r}
+myvec <- sample(myvec)
+myvec
+```
+* create a square matrix with these elements.
+```{r}
+m <- matrix(myvec, nrow=sqrt(length(myvec)))
+m
+```
+* find a function in r to transpose the matrix.
+```{r}
+m <- t(m)
+m
+```
+* calculate the sum and the mean of the elements in the first row and the last row.
+```{r}
+sum(m[1,])
+sum(m[-1,])
+mean(m[1,])
+mean(m[-1,])
+```
+* read about the eigen() function and use it on your matrix  
+```{r}
+eigen_m <- eigen(m)
+```
+* look carefully at the elements of `$values` and `$vectors`. What kind of numbers are these?  
+    * `$values` is the mathematical variance of a metrix and how symmetrical the matrix is. 
+    * `$vectors` is a special set of scalars associated with a linear system of equations. a vector whose direction remains unchanged when a linear transformation is applied to it.
+    
+* dig in with the typeof() function to figure out their type.
+```{r}
+typeof(eigen_m$values)
+typeof(eigen_m$vectors)
+# typeof returns "complex" for each of these values which are also labled as 'doubles'
+```
+* if have set your code up properly, you should be able to re-run it and create a matrix of different size because n_dims will change.
+
+
+### 2. Create a list with the following named elements:
+
+* mymatrix, which is a 4 x 4 matrix filled with random uniform values
+* mylogical which is a 100-element vector of TRUE or FALSE values. Do this efficiently by setting up a vector of random values and then applying an inequality to it.
+* my_letters, which is a 26-element vector of all the lower-case letters in random order.
+```{r}
+mylist <- list(mymatrix = matrix(data = runif(16), ncol = 4), 
+            mylogical = c(runif(100) < 0.5),
+            myletters = letters[1:26])
+```
+* create a new list, which has the element[2,2] from the matrix, the second element of the logical vector, and the second element of the letters vector.
+```{r}
+newlist <- list(mylist$mymatrix[2,2],
+                mylist$mylogical[2],
+                mylist$myletters[2])
+newlist
+```
+* use the typeof() function to confirm the underlying data types of each component in this list
+```{r}
+typeof(newlist[[1]])
+typeof(newlist[[2]])
+typeof(newlist[[3]])
+```
+* combine the underlying elements from the new list into a single atomic vector with the c() function.
+```{r}
+newvec <- c(unlist(newlist))
+newvec
+```
+* what is the data type of this vector?
+```{r}
+typeof(newvec)
+```
+
+### 3. Create a data frame with two variables (= columns) and 26 cases (= rows).
+* call the first variable my_unis and fill it with 26 random uniform values from 0 to 10  
+* call the second variable my_letters and fill it with 26 capital letters in random order.
+```{r}
+myunits <- runif(26,0, 10)
+my_letters <- sample(LETTERS[1:26]) 
+mydata <- data.frame(myunits, my_letters)
+mydata
+```
+
+* for the first variable, use a single line of code in R to select 4 random rows and replace the numerical values in those rows with NA.
+
+```{r}
+mydata[sample(nrow(mydata),4), ] <- NA
+```
+
+* for the first variable, write a single line of R code to identify which rows have the missing values.
+
+```{r}
+which(is.na(mydata$myunits))
+```
+
+* for the second variable, sort it in alphabetical order
+```{r}
+mydata <- mydata[order(mydata$my_letters),]
+mydata
+```
+
+* calculate the column mean for the first variable.
+```{r}
+summary(mydata$myunits)
+#or
+mean(mydata$myunits, na.rm = TRUE)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
