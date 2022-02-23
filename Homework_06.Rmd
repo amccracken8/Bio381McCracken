@@ -19,19 +19,24 @@ starfish <- read.table("C:/Users/andre/Desktop/Comp-Bio_381/TableS3_FigS3_data.c
 str(starfish)
 summary(starfish)
 ```
+  
 ### Plotting Histogram Data
+
 ```{r}
 p1 <- ggplot(data=starfish, aes(x=arm_length, y=..density..)) +
   geom_histogram(color="grey60",fill="cornsilk",size=0.2) 
 print(p1)
 ```
+
 ### Add empirical density curve
 
 ```{r}
 p1 <-  p1 +  geom_density(linetype="dotted",size=0.75)
 print(p1)  
 ```
+
 ### Get maximum likelihood parameters for normal
+
 ```{r}
 normPars <- fitdistr(starfish$arm_length,"normal")
 print(normPars)
@@ -39,7 +44,9 @@ str(normPars)
 normPars$estimate["mean"] # note structure of getting a named attribute
 normPars$estimate["sd"]
 ```
+
 ### Plot `normal` probability density
+
 ```{r}
 meanML <- normPars$estimate["mean"]
 sdML <- normPars$estimate["sd"]
@@ -51,6 +58,7 @@ xval <- seq(0,max(starfish$arm_length),len=length(starfish$arm_length))
 ```
 
 ### Plot `exponential` probability density
+
 ```{r}
 expoPars <- fitdistr(starfish$arm_length,"exponential")
 rateML <- expoPars$estimate["rate"]
@@ -60,11 +68,14 @@ stat2 <- stat_function(aes(x = xval, y = ..y..), fun = dexp, colour="blue", n = 
 ```
 
 ### Plot `uniform` probability density
+
 ```{r}
 stat3 <- stat_function(aes(x = xval, y = ..y..), fun = dunif, colour="darkgreen", n = length(starfish$arm_length), args = list(min=min(starfish$arm_length), max=max(starfish$arm_length)))
  p1 + stat + stat2 + stat3
 ```
+
 ### Plot `gamma` probability density
+
 ```{r}
 gammaPars <- fitdistr(starfish$arm_length,"gamma")
 shapeML <- gammaPars$estimate["shape"]
@@ -73,7 +84,9 @@ rateML <- gammaPars$estimate["rate"]
 stat4 <- stat_function(aes(x = xval, y = ..y..), fun = dgamma, colour="brown", n = length(starfish$arm_length), args = list(shape=shapeML, rate=rateML))
  p1 + stat + stat2 + stat3 + stat4
 ```
-### Plot beta probability density
+
+### Plot `beta` probability density
+
 ```{r}
 pSpecial <- ggplot(data=starfish, aes(x=arm_length/(max(arm_length + 0.1)), y=..density..)) +
   geom_histogram(color="grey60",fill="cornsilk",size=0.2) + 
@@ -93,6 +106,7 @@ pSpecial + statSpecial
 The best fitting distribution for this dataset is the gamma distribution, although the normal distribution is close as well. 
 
 ### Simulate a new dataset. 
+
 ```{r}
 newdata <- rgamma(n=(length(starfish$arm_length)),shape=shapeML, rate=rateML)
 newdata <- data.frame(1:(length(starfish$arm_length)),newdata)
