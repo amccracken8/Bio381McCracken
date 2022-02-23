@@ -1,0 +1,110 @@
+---
+title: "Homework_06"
+author: "Andrew McCracken"
+date: "2/23/2022"
+output: html_document
+---
+[Home Page](index.html)
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Read in data
+```{r}
+library(ggplot2) # for graphics
+library(MASS) # for maximum likelihood estimation
+
+starfish <- read.table("C:/Users/andre/Desktop/Comp-Bio_381/TableS3_FigS3_data.csv",header=TRUE,sep=",")
+str(starfish)
+summary(starfish)
+```
+### Plotting Histogram Data
+```{r}
+p1 <- ggplot(data=starfish, aes(x=arm_length, y=..density..)) +
+  geom_histogram(color="grey60",fill="cornsilk",size=0.2) 
+print(p1)
+```
+### Add empirical density curve
+
+```{r}
+p1 <-  p1 +  geom_density(linetype="dotted",size=0.75)
+print(p1)  
+```
+### Get maximum likelihood parameters for normal
+```{r}
+normPars <- fitdistr(starfish$arm_length,"normal")
+print(normPars)
+str(normPars)
+normPars$estimate["mean"] # note structure of getting a named attribute
+normPars$estimate["sd"]
+```
+### Plot `normal` probability density
+```{r}
+meanML <- normPars$estimate["mean"]
+sdML <- normPars$estimate["sd"]
+
+xval <- seq(0,max(starfish$arm_length),len=length(starfish$arm_length))
+
+ stat <- stat_function(aes(x = xval, y = ..y..), fun = dnorm, colour="red", n = length(starfish$arm_length), args = list(mean = meanML, sd = sdML))
+ p1 + stat
+```
+
+### Plot `exponential` probability density
+```{r}
+expoPars <- fitdistr(starfish$arm_length,"exponential")
+rateML <- expoPars$estimate["rate"]
+
+stat2 <- stat_function(aes(x = xval, y = ..y..), fun = dexp, colour="blue", n = length(starfish$arm_length), args = list(rate=rateML))
+ p1 + stat + stat2
+```
+
+### Plot `uniform` probability density
+```{r}
+stat3 <- stat_function(aes(x = xval, y = ..y..), fun = dunif, colour="darkgreen", n = length(starfish$arm_length), args = list(min=min(starfish$arm_length), max=max(starfish$arm_length)))
+ p1 + stat + stat2 + stat3
+```
+### Plot `gamma` probability density
+```{r}
+gammaPars <- fitdistr(starfish$arm_length,"gamma")
+shapeML <- gammaPars$estimate["shape"]
+rateML <- gammaPars$estimate["rate"]
+
+stat4 <- stat_function(aes(x = xval, y = ..y..), fun = dgamma, colour="brown", n = length(starfish$arm_length), args = list(shape=shapeML, rate=rateML))
+ p1 + stat + stat2 + stat3 + stat4
+```
+### Plot beta probability density
+```{r}
+pSpecial <- ggplot(data=starfish, aes(x=arm_length/(max(arm_length + 0.1)), y=..density..)) +
+  geom_histogram(color="grey60",fill="cornsilk",size=0.2) + 
+  xlim(c(0,1)) +
+  geom_density(size=0.75,linetype="dotted")
+
+betaPars <- fitdistr(x=starfish$arm_length/max(starfish$arm_length + 0.1),start=list(shape1=1,shape2=2),"beta")
+shape1ML <- betaPars$estimate["shape1"]
+shape2ML <- betaPars$estimate["shape2"]
+
+statSpecial <- stat_function(aes(x = xval, y = ..y..), fun = dbeta, colour="orchid", n = length(starfish$arm_length), args = list(shape1=shape1ML,shape2=shape2ML))
+pSpecial + statSpecial
+```
+
+### What distribution best fits this dataset?: 
+
+The best fitting distribution for this dataset is the gamma distribution, although the normal distribution is close as well. 
+
+### Simulate a new dataset. 
+```{r}
+newdata <- rgamma(n=(length(starfish$arm_length)),shape=shapeML, rate=rateML)
+newdata <- data.frame(1:(length(starfish$arm_length)),newdata)
+names(newdata) <- list("ID","myVar")
+newdata <- newdata[newdata$myVar>0,]
+str(newdata)
+summary(newdata$myVar)
+
+p2 <- ggplot(data=newdata, aes(x=myVar, y=..density..)) +
+  geom_histogram(color="grey60",fill="cornsilk",size=0.2) 
+print(p2)
+
+```
+
+
