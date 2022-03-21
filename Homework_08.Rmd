@@ -1,0 +1,96 @@
+---
+title: "Homework_08"
+author: "Andrew McCracken"
+date: "3/16/2022"
+output: html_document
+---
+
+[Home Page](index.html)
+
+# Simulating starfish dataset wegihts and Arm Lengths
+
+**2. Generating random normal distributions for variables in the dataset**
+```{r}
+library(tidyverse)
+
+start_weight <- rnorm(n=30, mean=33.5, sd=11)
+
+delta_weight_1 <- rnorm(n=15, mean=2.9, sd=1.8)
+delta_weight_2 <- rnorm(n=15, mean=2.9, sd=1.8)
+
+delta_weight <- c(delta_weight_1, delta_weight_2)
+
+treatment <- c(rep('A', 15),rep('B', 15))
+```
+**3. Formatting into a data frame**  
+sample sizes, means, and standard deviations were drawn directly from the data set I used in HW6 pertaining to a dietary experimental treatment to see how it affects sea star biomass. 
+
+```{r}
+S <- data.frame(treatment, start_weight, delta_weight)
+S <- mutate(.data = S, end_weight = start_weight + delta_weight)
+S
+```
+**4) T.test  between starfish arm_length and starting_weight**
+```{r}
+t.test(data = S, end_weight ~ treatment)
+```
+
+**Graphical output of linear model of the data**
+```{r}
+G <- ggplot(S, aes(x=treatment, y=end_weight)) + 
+  geom_boxplot()
+print(G)
+```
+
+##### Analysis
+
+Multiple runs with the same parameters generate a decent degree of variability in the model. the random normal distributions change each treatment every time new numbers are generated, sometimes ending in a statistical difference between the treamtne groups and sometimes not, depending on their distributions. this is with each group drawing from seperate normal distributions but with the same parameters.  
+
+##### **6) adjusting means of the groups. Given the sample sizes you have chosen, how small can the differences between the groups be (the “effect size”) for you to still detect a significant pattern (p < 0.05)?**
+
+target parameter = delta_weight. After running this multiple times, the means do not need to be changed for there to be a significant difference p < 0.05. because they are drawn from different distributions (although with the same parameters) there is enough deviation with the parameters chosen that statistical differences can be seen sometimes, though rarely. Adjusting the means by which weight is changed in each treatment from 2.9 to 3.5~4.0 for treatment B results in significant differences between the two treatment groups about 50% of the time. raising the mean to around 4.5 for treamtnet B returns significant different between groups most of the time and raising the mean to 5 bring it almost always. this leaves about a 2 pound difference in means results in signifficant differences in the end weight of the starfish in this treatment. 
+
+
+```{r}
+start_weight <- rnorm(n=30, mean=33.5, sd=11)
+
+delta_weight_1 <- rnorm(n=15, mean=2.9, sd=1.5)
+delta_weight_2 <- rnorm(n=15, mean=5, sd=1.5)
+
+delta_weight <- c(delta_weight_1, delta_weight_2)
+
+treatment <- c(rep('A', 15),rep('B', 15))
+
+S <- data.frame(treatment, start_weight, delta_weight)
+S <- mutate(.data = S, end_weight = start_weight + delta_weight)
+
+t.test(data = S, delta_weight ~ treatment)
+
+G <- ggplot(S, aes(x=treatment, y=end_weight)) + 
+  geom_boxplot()
+print(G)
+```
+
+##### **7. Changing the sample sizes for each distribution.**
+
+For this secton I will keep the mean1=2.9 and mean2=5 for significant generated for N=15 (if they had the same mean it would not be significant no matter the N). 
+```{r}
+start_weight <- rnorm(n=20, mean=33.5, sd=11)
+
+delta_weight_1 <- rnorm(n=10, mean=2.9, sd=1.5)
+delta_weight_2 <- rnorm(n=10, mean=5, sd=1.5)
+
+delta_weight <- c(delta_weight_1, delta_weight_2)
+
+treatment <- c(rep('A', 10),rep('B', 10))
+
+S <- data.frame(treatment, start_weight, delta_weight)
+S <- mutate(.data = S, end_weight = start_weight + delta_weight)
+
+t.test(data = S, delta_weight ~ treatment)
+
+G <- ggplot(S, aes(x=treatment, y=end_weight)) + 
+  geom_boxplot()
+print(G)
+```
+Testing it with multiple runs, a sample size of 10 seems as low as we can go to get significance most of the time. once samples drop below 10 with the current parameters used, it returns mostly P>0.5. 
