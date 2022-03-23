@@ -1,0 +1,73 @@
+---
+title: "Homework_09"
+author: "Andrew McCracken"
+date: "3/23/2022"
+output: html_document
+---
+
+[Home Page](index.html)
+
+```{r}
+##############################
+# FUNCTION: sim_treat_data
+
+# purpose: Simulates treatment data between two groups of n size drawn from two separate normal distributions wiht parameters mean and sd as defined by user. both starting variable (weight for example) population of groups A and B are drawn from a normal distribution as well as the change in that variable dependant on treatment (ie. change in weight). In the end it calculates the result from the start + change in start variable = end variable. 
+
+# input: number of samples for each treatment (nA,NB), means start_Var (mean_A, mean_B), standard deviation of each start_Var (sd_A, sd_B), change in means of each treatment(dmean_A, dmean_B) and standard deviation of each treatment (dsd_A, dsd_B).
+
+# output:  returns 1. a boxplot of the two treatment groups measuring the end-result of each treatment being compaired 2. A t test compairing the changes between the two groups. 
+# ------------------------------------------
+sim_treat_data <- function(n_A=30, n_B=30, mean_A=33.5, mean_B=33.5, sd_A=10, sd_B=10, dmean_A=3, dmean_B=3, dsd_A=1, dsd_B=1) {
+  
+  library(tidyverse)
+
+  #Simulate Datasets
+  start_Var_A <- rnorm(n=n_A, mean=mean_A, sd=sd_A)
+  start_Var_B <- rnorm(n=n_B, mean=mean_B, sd=sd_B)
+  
+  delta_Var_A <- rnorm(n=n_A, mean=dmean_A, sd=dsd_A) 
+  delta_Var_B <- rnorm(n=n_B, mean=dmean_B, sd=dsd_B)
+ 
+  start_Var <- c(start_Var_A, start_Var_B)
+  delta_Var <- c(delta_Var_A, delta_Var_B) #must add up to start weight n
+  treatment <- c(rep('A', n_A),rep('B', n_B)) # assign into groups A and B
+  
+  # compile into dataframe and calculate end weight
+  d_frame <- data.frame(treatment, start_Var, delta_Var)
+  d_frame <- mutate(.data = d_frame, end_Var = start_Var + delta_Var)
+  
+  #Graph data
+  G <- ggplot(d_frame, aes(x=treatment, y=end_Var)) + 
+    geom_boxplot()
+  print(G)
+  
+  #t.test between final weights of each treatment group
+  t_test <- t.test(data = d_frame, end_Var ~ treatment)
+  print(c('p.value= ', t_test$p.value))
+  
+  ### ScatterPlot of the two groups
+  
+  G2 <- ggplot(data=d_frame, aes(x = start_Var, y = end_Var, color = treatment)) +
+  geom_point(shape = 17, size = 2)
+  print(G2)
+}
+```
+
+##### Simulating Data with two treatment groups drawn from different normal distributions but with the same parameters. the delta_mean of the change in Variable_A has been changed for each of these groups to demonstrate the differences two treatments could cause in Varailbe_A as the resulting end_Variable (end_Var)
+```{r}
+sim_treat_data(dmean_A=10, dmean_B=3)
+```
+
+# Making a For loop for running multiple parameters.
+## dmean_A = 3,6,9 ; dmean_B = 3,3,3
+
+```{r}
+for(i in 1:3) {
+  print(c('average change in group_A=',3*i, 'average change in group_b= 3'))
+  sim_treat_data(dmean_A=3*i)
+}
+```
+
+
+
+
